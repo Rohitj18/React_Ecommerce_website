@@ -1,0 +1,30 @@
+pipeline{
+    agent {label 'dev'}
+    stages{
+        stage("cloning"){
+            steps{
+                git(url: 'https://github.com/Rohitj18/React_Ecommerce_website.git',branch: 'master',poll: true)
+            }
+        }
+        stage("building"){
+            steps{
+                sh 'docker build . -t rohit1810/react-app-cicd:latest'
+            }
+        }
+        stage("login and pushing image"){
+            steps{
+                withCredentials([usernamePassword(credentialsId:'dockerhub',passwordVariable:'dockerhubPassword',usernameVariable:'dockerhubUser')]){
+                    sh "docker login -u ${env.dockerhubUser} -p ${env.dockerhubPassword}"
+                    sh "docker push rohit1810/react-app-cicd:latest"
+                }
+                
+            }
+        }
+        stage("deploying"){
+            steps{
+                sh "docker-compose down"
+                sh "docker-compose up -d"
+            }
+        }
+    }
+}
