@@ -18,7 +18,7 @@ const Navbar = () => {
 
           <div className="flex items-center font-medium text-slate-100 mr-5 space-x-6">
             <NavLink to="/">
-              <p>Homee</p>
+              <p>Home</p>
             </NavLink>
 
             <NavLink to="/cart">
