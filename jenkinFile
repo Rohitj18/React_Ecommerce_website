@@ -1,29 +1,30 @@
 pipeline{
     agent {label 'dev'}
     stages{
-        stage("cloning"){
+        stage('cloning'){
             steps{
                 git(url: 'https://github.com/Rohitj18/React_Ecommerce_website.git',branch: 'master',poll: true)
             }
         }
-        stage("building"){
+        stage('building image'){
             steps{
-                sh 'docker build . -t rohit1810/react-app-cicd:latest'
-            }
-        }
-        stage("login and pushing image"){
-            steps{
-                withCredentials([usernamePassword(credentialsId:'dockerhub',passwordVariable:'dockerhubPassword',usernameVariable:'dockerhubUser')]){
-                    sh "docker login -u ${env.dockerhubUser} -p ${env.dockerhubPassword}"
-                    sh "docker push rohit1810/react-app-cicd:latest"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub',passwordVariable: 'Password', usernameVariable: 'User')]){
+                    sh "sudo docker build . -t ${env.User}/react-ecom-app:latest"
                 }
-                
             }
         }
-        stage("deploying"){
+        stage('dockerhub log in and image push'){
             steps{
-                sh "docker-compose down"
-                sh "docker-compose up -d"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'User')]){
+                    sh "sudo docker login -u ${env.User} -p ${env.Password}"
+                    sh "sudo docker push ${env.User}/react-ecom-app:latest"
+                }
+            }
+        }
+        stage('deploying application'){
+            steps{
+                sh 'sudo docker-compose down'
+                sh 'sudo docker-compose up -d'
             }
         }
     }
